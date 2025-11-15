@@ -31,17 +31,17 @@ async function run() {
 
         app.get('/my-transaction', verifyFirebaseToken, async (req, res) => {
             const email = req.query.email;
-            const cursor = dataCollection.find({ email : email }).sort({amount : -1});
+            const cursor = dataCollection.find({ email: email }).sort({ amount: -1 });
             const result = await cursor.toArray();
             res.send(result)
         })
 
         app.get('/my-transaction/:id', verifyFirebaseToken, async (req, res) => {
-                    const {id} = req.params;
-                    const query = { _id: new ObjectId(id) }
-                    const result = await dataCollection.findOne(query)
-                    res.send(result)
-                })
+            const { id } = req.params;
+            const query = { _id: new ObjectId(id) }
+            const result = await dataCollection.findOne(query)
+            res.send(result)
+        })
 
         app.post('/my-transaction', async (req, res) => {
             const data = req.body;
@@ -50,17 +50,24 @@ async function run() {
         })
 
         app.put('/my-transaction/:id', async (req, res) => {
-                    const {id} = req.params
-                    const data = req.body;
-                    
-                    const filter = { _id: new ObjectId(id) }
-                    const update = {
-                        $set: data
-                    }
-        
-                    const result = await dataCollection.updateOne(filter, update)
-                    res.send(result)
-                })
+            const { id } = req.params
+            const data = req.body;
+
+            const filter = { _id: new ObjectId(id) }
+            const update = {
+                $set: data
+            }
+
+            const result = await dataCollection.updateOne(filter, update)
+            res.send(result)
+        })
+
+        app.delete('/my-transaction/:id', async (req, res) => {
+            const { id } = req.params;
+            const filter = { _id: new ObjectId(id) };
+            const result = await dataCollection.deleteOne(filter)
+            res.send(result)
+        })
 
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
