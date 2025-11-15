@@ -1,12 +1,18 @@
 const express = require('express')
 const cors = require('cors')
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb')
+var admin = require("firebase-admin")
 require("dotenv").config()
+var serviceAccount = require("./userKey.json");
 const app = express()
 const port = process.env.PORT || 3000;
 
 app.use(cors())
 app.use(express.json())
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
 
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.abvmfph.mongodb.net/?appName=Cluster0`
 
@@ -21,6 +27,27 @@ const client = new MongoClient(uri, {
 app.get("/", (req, res) => {
     res.send('Hello FinEase')
 })
+
+const verifyFirebaseToken = async (req, res, next) => {
+    const authorization = req.headers.authorization;
+
+    if(!authorization){
+        res.status(401).send({
+            message: "unauthorized access!"
+        })
+    }
+
+    const token = authorization.split(' ')[1]
+
+    try {
+        await admin.auth().verifyIdToken(token)
+        next();
+    } catch(error) {
+        res.status(401).send({
+            message: "unauthorized access!"
+        })
+    }    
+}
 
 async function run() {
     try {
