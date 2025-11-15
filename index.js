@@ -26,6 +26,9 @@ async function run() {
     try {
         await client.connect();
 
+        const db = client.db("financeDB");
+        const dataCollection = db.collection("main-data");
+
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
