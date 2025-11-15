@@ -36,6 +36,13 @@ async function run() {
             res.send(result)
         })
 
+        app.get('/my-transaction/:id', verifyFirebaseToken, async (req, res) => {
+                    const {id} = req.params;
+                    const query = { _id: new ObjectId(id) }
+                    const result = await dataCollection.findOne(query)
+                    res.send(result)
+                })
+
         app.post('/my-transaction', async (req, res) => {
             const data = req.body;
             const result = await dataCollection.insertOne(data)
