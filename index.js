@@ -29,6 +29,13 @@ async function run() {
         const db = client.db("financeDB");
         const dataCollection = db.collection("main-data");
 
+        app.get('/my-transaction', verifyFirebaseToken, async (req, res) => {
+            const email = req.query.email;
+            const cursor = dataCollection.find({ email : email }).sort({amount : -1});
+            const result = await cursor.toArray();
+            res.send(result)
+        })
+
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
